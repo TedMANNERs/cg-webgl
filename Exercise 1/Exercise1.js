@@ -56,7 +56,7 @@ function setUpAttributesAndUniforms(){
  */
 function setUpBuffers(){
     "use strict"
-    setUpRectangleBuffer();
+    setUpRectangleBuffer(0.2,0.2,0,1,0,1);
 }
 
 /**
