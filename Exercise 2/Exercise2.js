@@ -14,8 +14,11 @@ var gl;
 var ctx = {
     shaderProgram: -1, //wird unten wieder überschrieben
     aVertexPositionId: -1,
-    uColorId: -1
+    aVertexColorId: -1
 };
+
+// we keep all the parameters for drawing a specific object together
+var rectangleObjects = {};
 
 /**
  * Startup function to be called when the body is loaded
@@ -50,7 +53,7 @@ function setUpAttributesAndUniforms(){
     "use strict";
     // finds the index of the variable in the program || überschreibt ctx.aVertexPositionId
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
-    ctx.uColorId = gl.getUniformLocation(ctx.shaderProgram, "uColor");
+    ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
 }
 
 /**
@@ -58,7 +61,8 @@ function setUpAttributesAndUniforms(){
  */
 function setUpBuffers(){
     "use strict"
-    setUpRectangleBuffer(0.2,0.2,0,1,0,1);
+    rectangleObjects[0] = setUpRectangleBuffer(0.2, 0.1, 0.13, 0.13);
+    rectangleObjects[1] = setUpRectangleBuffer(-0.2, -0.1, 0.13, 0.13);
 }
 
 /**
@@ -69,7 +73,7 @@ function draw() {
     console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
     // add drawing routines here
-    gl.uniform4f(ctx.uColorId , 0.0, 1.0, 0.0, 1.0);
-    drawRectangle();
+    drawRectangle(rectangleObjects[0]);
+    drawRectangle(rectangleObjects[1]);
     console.log("done");
 }
