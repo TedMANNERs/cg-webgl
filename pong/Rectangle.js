@@ -31,7 +31,12 @@ class Rectangle {
         this.gl.vertexAttribPointer(this.ctx.aVertexColorId, 4, this.gl.FLOAT, false, 24,8);
         this.gl.enableVertexAttribArray(this.ctx.aVertexColorId);
 
-        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0,4);
+        // Set up the world coordinates
+        var projectionMat = mat3.create();
+        mat3.fromScaling(projectionMat, [2.0/this.gl.drawingBufferWidth, 2.0/this.gl.drawingBufferHeight]);
+        this.gl.uniformMatrix3fv(this.ctx.uProjectionMatId, false, projectionMat);
+
+        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     }
 }
 

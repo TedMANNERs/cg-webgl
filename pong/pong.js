@@ -16,7 +16,9 @@ var gl;
 var ctx = {
     shaderProgram: -1, //wird unten wieder überschrieben
     aVertexPositionId: -1,
-    aVertexColorId: -1
+    aVertexColorId: -1,
+    uProjectionMatId: -1,
+    uModelMatId: -1
 };
 
 // we keep all the parameters for drawing a specific object together
@@ -58,6 +60,8 @@ function setUpAttributesAndUniforms(){
     // finds the index of the variable in the program || überschreibt ctx.aVertexPositionId
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
+    ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
+    ctx.uModelMatId = gl.getUniformLocation(ctx.shaderProgram, "uModelMat");
 }
 
 /**
