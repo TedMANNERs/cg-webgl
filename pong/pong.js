@@ -21,8 +21,14 @@ var ctx = {
     uModelMatId: -1
 };
 
-// we keep all the parameters for drawing a specific object together
-const shapeObjects = [];
+// names of the objects we want to draw
+const DIVIDER = "divider"
+const BALL = "ball"
+const LEFT_PADDLE = "left_paddle"
+const RIGHT_PADDLE = "RIGHT_paddle"
+
+// dictionary with all the objects we want to draw.
+const shapeObjects = {};
 
 /**
  * Startup function to be called when the body is loaded
@@ -71,11 +77,19 @@ function setUpBuffers(){
     "use strict"
     let ball = new Rectangle(gl, ctx, 0, 0, 20, 20, Color.WHITE);
     ball.setUpBuffer();
-    shapeObjects.push(ball)
+    shapeObjects[BALL] = ball;
 
-    var divider = new Rectangle(gl, ctx, 0, 0, 600, 2, Color.WHITE);
+    let divider = new Rectangle(gl, ctx, 0, 0, 600, 3, Color.WHITE);
     divider.setUpBuffer();
-    shapeObjects.push(divider)
+    shapeObjects[DIVIDER] = divider;
+
+    let leftPaddle = new Rectangle(gl, ctx, -370, 0, 80, 20, Color.WHITE);
+    leftPaddle.setUpBuffer();
+    shapeObjects[LEFT_PADDLE] = leftPaddle;
+
+    let rightPaddle = new Rectangle(gl, ctx, 370, 0, 80, 20, Color.WHITE);
+    rightPaddle.setUpBuffer();
+    shapeObjects[RIGHT_PADDLE] = rightPaddle;
 }
 
 /**
@@ -92,7 +106,9 @@ function draw() {
     gl.uniformMatrix3fv(ctx.uProjectionMatId , false , projectionMat);
 
     // add drawing routines here
-    shapeObjects.forEach(rect => rect.draw())
+    for (const [key, shape] of Object.entries(shapeObjects)) {
+        shape.draw()
+    }
     console.log("done");
 }
 
