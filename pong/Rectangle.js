@@ -1,18 +1,32 @@
 class Rectangle {
-    constructor(gl, ctx) {
+    constructor(gl, ctx, x, y, height, width, color) {
         this.gl = gl;
         this.ctx = ctx;
         this.buffer = -1;
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.width = width;
+        this.color = color;
     }
 
-    setUpBuffer(x, y, height, width, color) {
+    setUpBuffer() {
         let buffer = this.gl.createBuffer();
+        //let x1 = 0 - this.height + this.x
+        //let y1 = 0 - this.height + this.y
+        //let x2 = this.width + this.x
+        //let y2 = this.width + this.y
+        //let y3 = 0 - this.width + this.y
+        let r = this.color.r;
+        let g = this.color.g;
+        let b = this.color.b;
+        let a = this.color.a;
 
         const vertices = [
-            0 - height + x, height + y, color.r, color.g, color.b, color.a,
-            width + x, width + y, color.r, color.g, color.b, color.a,
-            width + x, 0 - width + y, color.r, color.g, color.b, color.a,
-            0 - height + x, 0 - height + y, color.r, color.g, color.b, color.a
+            -0.5, -0.5, r, g, b, a,
+            0.5, -0.5, r, g, b, a,
+            0.5, 0.5, r, g, b, a,
+            -0.5, 0.5, r, g, b, a
         ];
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
@@ -21,20 +35,22 @@ class Rectangle {
     }
 
     draw() {
+        // Set up the model coordinates
+        // translate -> rotate -> draw
+        let modelMat = mat3.create();
+        mat3.fromTranslation(modelMat, vec2.fromValues(this.x, this.y));
+        mat3.scale(modelMat, modelMat, vec2.fromValues(this.width, this.height));
+        this.gl.uniformMatrix3fv(this.ctx.uModelMatId, false, modelMat);
+
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
 
         // position 2x4 bytes
         this.gl.vertexAttribPointer(this.ctx.aVertexPositionId, 2, this.gl.FLOAT, false, 24,0);
         this.gl.enableVertexAttribArray(this.ctx.aVertexPositionId);
 
-        //color 4x4 bytes
+        // color 4x4 bytes
         this.gl.vertexAttribPointer(this.ctx.aVertexColorId, 4, this.gl.FLOAT, false, 24,8);
         this.gl.enableVertexAttribArray(this.ctx.aVertexColorId);
-
-        // Set up the world coordinates
-        var projectionMat = mat3.create();
-        mat3.fromScaling(projectionMat, [2.0/this.gl.drawingBufferWidth, 2.0/this.gl.drawingBufferHeight]);
-        this.gl.uniformMatrix3fv(this.ctx.uProjectionMatId, false, projectionMat);
 
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     }

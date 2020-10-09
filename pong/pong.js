@@ -22,7 +22,7 @@ var ctx = {
 };
 
 // we keep all the parameters for drawing a specific object together
-const rectangleObjects = [];
+const shapeObjects = [];
 
 /**
  * Startup function to be called when the body is loaded
@@ -47,7 +47,7 @@ function initGL() {
     setUpBuffers();
 
     // set the clear color here
-    gl.clearColor(.2,.2,.2,1); //-> damit wird alles übermalen (erst wenn clear)
+    gl.clearColor(.1,.1,.1,1); //-> damit wird alles übermalen (erst wenn clear)
     
     // add more necessary commands here
 }
@@ -69,13 +69,13 @@ function setUpAttributesAndUniforms(){
  */
 function setUpBuffers(){
     "use strict"
-    var rect1 = new Rectangle(gl, ctx);
-    rect1.setUpBuffer(0.2, 0.1, 0.13, 0.13, Color.WHITE);
-    rectangleObjects.push(rect1)
+    let ball = new Rectangle(gl, ctx, 0, 0, 20, 20, Color.WHITE);
+    ball.setUpBuffer();
+    shapeObjects.push(ball)
 
-    var rect2 = new Rectangle(gl, ctx);
-    rect2.setUpBuffer(-0.2, -0.1, 0.13, 0.13, Color.RED);
-    rectangleObjects.push(rect2)
+    var divider = new Rectangle(gl, ctx, 0, 0, 600, 2, Color.WHITE);
+    divider.setUpBuffer();
+    shapeObjects.push(divider)
 }
 
 /**
@@ -85,8 +85,14 @@ function draw() {
     "use strict";
     console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Set up the world coordinates
+    let projectionMat = mat3.create();
+    mat3.fromScaling(projectionMat, vec2.fromValues(2.0/gl.drawingBufferWidth, 2.0/gl.drawingBufferHeight));
+    gl.uniformMatrix3fv(ctx.uProjectionMatId , false , projectionMat);
+
     // add drawing routines here
-    rectangleObjects.forEach(rect => rect.draw())
+    shapeObjects.forEach(rect => rect.draw())
     console.log("done");
 }
 
