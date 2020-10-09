@@ -8,6 +8,8 @@ class Rectangle {
         this.height = height;
         this.width = width;
         this.color = color;
+
+        this.setUpBuffer();
     }
 
     setUpBuffer() {
