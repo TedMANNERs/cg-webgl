@@ -3,6 +3,7 @@ class Rectangle {
         this.gl = gl;
         this.ctx = ctx;
         this.positionBuffer = -1;
+        this.colorBuffer = -1;
         this.x = x;
         this.y = y;
         this.height = height;
@@ -21,6 +22,24 @@ class Rectangle {
         this.isHidden = false
     }
 
+    updateColor(color) {
+        this.color = color;
+        this.setUpColorBuffer()
+    }
+
+    setUpColorBuffer() {
+        let buffer = this.gl.createBuffer();
+        const colors = [
+            this.color.r, this.color.g, this.color.b, this.color.a,
+            this.color.r, this.color.g, this.color.b, this.color.a,
+            this.color.r, this.color.g, this.color.b, this.color.a,
+            this.color.r, this.color.g, this.color.b, this.color.a
+        ]
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+        this.colorBuffer = buffer;
+    }
+
     setUpBuffer() {
         let buffer = this.gl.createBuffer();
 
@@ -35,6 +54,7 @@ class Rectangle {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
         this.positionBuffer = buffer;
+        this.setUpColorBuffer()
     }
 
     draw() {
@@ -54,16 +74,8 @@ class Rectangle {
         this.gl.vertexAttribPointer(this.ctx.aVertexPositionId, 2, this.gl.FLOAT, false, 0,0);
         this.gl.enableVertexAttribArray(this.ctx.aVertexPositionId);
 
-        // setup color buffer to allow runtime updates
-        const colors = [
-            this.color.r, this.color.g, this.color.b, this.color.a,
-            this.color.r, this.color.g, this.color.b, this.color.a,
-            this.color.r, this.color.g, this.color.b, this.color.a,
-            this.color.r, this.color.g, this.color.b, this.color.a
-        ]
-        const colorBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
 
         // color 4x4 bytes
         this.gl.vertexAttribPointer(this.ctx.aVertexColorId, 4, this.gl.FLOAT, false, 0,0);
