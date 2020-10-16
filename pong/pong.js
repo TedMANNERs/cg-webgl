@@ -27,9 +27,20 @@ let ctx = {
 const DIVIDER = "divider"
 const BALL = "ball"
 const LEFT_PADDLE = "left_paddle"
-const RIGHT_PADDLE = "RIGHT_paddle"
+const RIGHT_PADDLE = "right_paddle"
+const HEALTH = "health"
+const LEFT_PLAYER = "left_player"
+const RIGHT_PLAYER = "right_player"
 
 const PADDLE_SPEED = 10
+const BALL_SPEED = 0.3
+const SCREEN_WIDTH = 800
+const SCREEN_HEIGHT = 600
+
+const health = {
+    [LEFT_PLAYER]: 3,
+    [RIGHT_PLAYER]: 3
+}
 
 // dictionary with all the objects we want to draw.
 const shapeObjects = {};
@@ -80,10 +91,16 @@ function setUpAttributesAndUniforms(){
  */
 function setUpBuffers(){
     "use strict"
-    shapeObjects[BALL] = new Ball(gl, ctx, 0, 0, 20, 20, Color.WHITE, 0.3);
+    shapeObjects[BALL] = new Ball(gl, ctx, 0, 0, 20, 20, Color.WHITE, BALL_SPEED);
     shapeObjects[DIVIDER] = new Rectangle(gl, ctx, 0, 0, 600, 3, Color.WHITE);
     shapeObjects[LEFT_PADDLE] = new Rectangle(gl, ctx, -370, 0, 80, 20, Color.WHITE);
     shapeObjects[RIGHT_PADDLE] = new Rectangle(gl, ctx, 370, 0, 80, 20, Color.WHITE);
+    shapeObjects[LEFT_PLAYER + HEALTH + 1] = new Rectangle(gl, ctx, -50, 250, 20, 5, Color.WHITE);
+    shapeObjects[LEFT_PLAYER + HEALTH + 2] = new Rectangle(gl, ctx, -60, 250, 20, 5, Color.WHITE);
+    shapeObjects[LEFT_PLAYER + HEALTH + 3] = new Rectangle(gl, ctx, -70, 250, 20, 5, Color.WHITE);
+    shapeObjects[RIGHT_PLAYER + HEALTH + 1] = new Rectangle(gl, ctx, 50, 250, 20, 5, Color.WHITE);
+    shapeObjects[RIGHT_PLAYER + HEALTH + 2] = new Rectangle(gl, ctx, 60, 250, 20, 5, Color.WHITE);
+    shapeObjects[RIGHT_PLAYER + HEALTH + 3] = new Rectangle(gl, ctx, 70, 250, 20, 5, Color.WHITE);
 }
 
 /**
@@ -124,24 +141,19 @@ function drawAnimated(timestamp) {
 
     // draw
     draw();
-
-    let ball = shapeObjects[BALL];
-    if (ball.x <= -390) {
-        alert("Right Player won!")
-        return
-    }
-    if (ball.x >= 390) {
-        alert("Left Player won!")
-        return
-    }
-
     // request the next frame
     window.requestAnimationFrame(drawAnimated);
 }
 
+function ReduceHealth(player) {
+    shapeObjects[player + HEALTH + health[player]].hide();
+    health[player]--;
+    return health[player]
+}
+
 function MoveRightPaddle(elapsed_time) {
     let paddle = shapeObjects[RIGHT_PADDLE];
-    const max_top = 300 - paddle.height / 2;
+    const max_top = SCREEN_HEIGHT / 2 - paddle.height / 2;
     if (isDown(key.UP)) {
         paddle.y < max_top ? paddle.y += PADDLE_SPEED : paddle.y = max_top;
     }
@@ -163,27 +175,62 @@ function UpdateBallPosition(elapsed_time) {
     let right_paddle = shapeObjects[RIGHT_PADDLE];
 
     // collision with left paddle
-    if (ball.x < left_paddle.x + ball.width) {
+    if (ball.x < left_paddle.x + ball.width &&
+        ball.x > left_paddle.x) {
         const half_paddle_height = left_paddle.height / 2;
-        if (ball.y < left_paddle.y + half_paddle_height && ball.y > left_paddle.y - half_paddle_height) {
+        if (ball.y < left_paddle.y + half_paddle_height &&
+            ball.y > left_paddle.y - half_paddle_height) {
+            ball.x = left_paddle.x + ball.width
             ball.step_movement_x *= -1; // invert x speed
         }
     }
 
     // collision with right paddle
-    if (ball.x > right_paddle.x - ball.width) {
+    if (ball.x > right_paddle.x - ball.width &&
+        ball.x < right_paddle.x) {
         const half_paddle_height = right_paddle.height / 2;
-        if (ball.y < right_paddle.y + half_paddle_height && ball.y > right_paddle.y - half_paddle_height) {
+        if (ball.y < right_paddle.y + half_paddle_height &&
+            ball.y > right_paddle.y - half_paddle_height) {
+            ball.x = right_paddle.x - ball.width
             ball.step_movement_x *= -1; // invert x speed
         }
     }
     // collision with top and bottom border
-    if (Math.abs(ball.y) >= 300 - ball.height / 2 - 5) {
+    const absBallY = Math.abs(ball.y);
+    const maxVerticalPos = SCREEN_HEIGHT / 2 - ball.height / 2 - 5;
+    if (absBallY >= maxVerticalPos) {
+        ball.y = maxVerticalPos * (ball.y / absBallY)
         ball.step_movement_y *= -1;
+    }
+
+    // collision with left border
+    if (ball.x <= -SCREEN_WIDTH / 2 + 10) {
+        console.log("Right Player scored!");
+        const playerHealth = ReduceHealth(LEFT_PLAYER);
+        if (playerHealth <= 0) {
+            alert("RIGHT Player won!");
+            return;
+        }
+        ResetBall(ball)
+    } // collision with right border
+    else if (ball.x >= SCREEN_WIDTH / 2 - 10) {
+        console.log("Left Player scored!");
+        const playerHealth = ReduceHealth(RIGHT_PLAYER);
+        if (playerHealth <= 0) {
+            alert("Left Player won!");
+            return;
+        }
+        ResetBall(ball)
     }
 
     ball.x += ball.step_movement_x * elapsed_time;
     ball.y += ball.step_movement_y * elapsed_time;
+}
+
+function ResetBall(ball) {
+    ball.x = 0;
+    ball.y = 0;
+    ball.step_movement_x *= -1;
 }
 
 // Key Handling

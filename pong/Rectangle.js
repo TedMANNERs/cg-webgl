@@ -1,5 +1,5 @@
 class Rectangle {
-    constructor(gl, ctx, x, y, height, width, color) {
+    constructor(gl, ctx, x, y, height, width, color, isHidden=false) {
         this.gl = gl;
         this.ctx = ctx;
         this.buffer = -1;
@@ -8,8 +8,17 @@ class Rectangle {
         this.height = height;
         this.width = width;
         this.color = color;
+        this.isHidden = isHidden;
 
         this.setUpBuffer();
+    }
+
+    hide() {
+        this.isHidden = true
+    }
+
+    show() {
+        this.isHidden = false
     }
 
     setUpBuffer() {
@@ -37,6 +46,9 @@ class Rectangle {
     }
 
     draw() {
+        if (this.isHidden)
+            return
+
         // Set up the model coordinates
         // translate -> rotate -> draw
         let modelMat = mat3.create();
