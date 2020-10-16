@@ -148,6 +148,15 @@ function drawAnimated(timestamp) {
 function ReduceHealth(player) {
     shapeObjects[player + HEALTH + health[player]].hide();
     health[player]--;
+    switch (health[player]) {
+        case 2:
+            shapeObjects[player + HEALTH + health[player]].color = Color.YELLOW;
+            shapeObjects[player + HEALTH + (health[player] - 1)].color = Color.YELLOW;
+            break;
+        case 1:
+            shapeObjects[player + HEALTH + health[player]].color = Color.RED;
+            break;
+    }
     return health[player]
 }
 
