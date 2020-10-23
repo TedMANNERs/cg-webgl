@@ -32,14 +32,14 @@ const HEALTH = "health"
 const LEFT_PLAYER = "left_player"
 const RIGHT_PLAYER = "right_player"
 
-const PADDLE_SPEED = 10
+const PADDLE_SPEED = 0.3
 const BALL_SPEED = 0.3
 const SCREEN_WIDTH = 800
 const SCREEN_HEIGHT = 600
 
 const health = {
-    [LEFT_PLAYER]: 3,
-    [RIGHT_PLAYER]: 3
+    [LEFT_PLAYER]: 5,
+    [RIGHT_PLAYER]: 5
 }
 
 // dictionary with all the objects we want to draw.
@@ -95,12 +95,13 @@ function setUpBuffers(){
     shapeObjects[DIVIDER] = new Rectangle(gl, ctx, 0, 0, 600, 3, Color.WHITE);
     shapeObjects[LEFT_PADDLE] = new Rectangle(gl, ctx, -370, 0, 80, 20, Color.WHITE);
     shapeObjects[RIGHT_PADDLE] = new Rectangle(gl, ctx, 370, 0, 80, 20, Color.WHITE);
-    shapeObjects[LEFT_PLAYER + HEALTH + 1] = new Rectangle(gl, ctx, -50, 250, 20, 5, Color.WHITE);
-    shapeObjects[LEFT_PLAYER + HEALTH + 2] = new Rectangle(gl, ctx, -60, 250, 20, 5, Color.WHITE);
-    shapeObjects[LEFT_PLAYER + HEALTH + 3] = new Rectangle(gl, ctx, -70, 250, 20, 5, Color.WHITE);
-    shapeObjects[RIGHT_PLAYER + HEALTH + 1] = new Rectangle(gl, ctx, 50, 250, 20, 5, Color.WHITE);
-    shapeObjects[RIGHT_PLAYER + HEALTH + 2] = new Rectangle(gl, ctx, 60, 250, 20, 5, Color.WHITE);
-    shapeObjects[RIGHT_PLAYER + HEALTH + 3] = new Rectangle(gl, ctx, 70, 250, 20, 5, Color.WHITE);
+
+    for (let i = 1; i <= health[LEFT_PLAYER]; i++) {
+        shapeObjects[LEFT_PLAYER + HEALTH + i] = new Rectangle(gl, ctx, -40 - i * 10, 250, 20, 5, Color.WHITE);
+    }
+    for (let i = 1; i <= health[RIGHT_PLAYER]; i++) {
+        shapeObjects[RIGHT_PLAYER + HEALTH + i] = new Rectangle(gl, ctx, 40 + i * 10, 250, 20, 5, Color.WHITE);
+    }
 }
 
 /**
@@ -164,11 +165,11 @@ function MoveRightPaddle(elapsed_time) {
     let paddle = shapeObjects[RIGHT_PADDLE];
     const max_top = SCREEN_HEIGHT / 2 - paddle.height / 2;
     if (isDown(key.UP)) {
-        paddle.y < max_top ? paddle.y += PADDLE_SPEED : paddle.y = max_top;
+        paddle.y < max_top ? paddle.y += PADDLE_SPEED * elapsed_time : paddle.y = max_top;
     }
 
     if (isDown(key.DOWN)) {
-        paddle.y > -max_top ? paddle.y -= PADDLE_SPEED : paddle.y = -max_top;
+        paddle.y > -max_top ? paddle.y -= PADDLE_SPEED * elapsed_time : paddle.y = -max_top;
     }
 }
 
