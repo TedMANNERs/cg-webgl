@@ -89,15 +89,16 @@ function draw() {
     let projectionMat = mat4.create();
     const fov_y = glMatrix.toRadian(45);
     mat4.perspective(projectionMat, fov_y, gl.drawingBufferWidth/gl.drawingBufferHeight, 0.1, 100);
-    gl.uniformMatrix4fv(ctx.uProjectionMatId , false , projectionMat);
 
     // Set up the view matrix for the camera
     let viewMat = mat4.create();
     mat4.lookAt(viewMat,
-        vec3.fromValues(10,10,5), // Camera position in world space
+        vec3.fromValues(10,10,10), // Camera position in world space
         vec3.fromValues(0,0,0), // looks at origin
-        vec3.fromValues(0,1,0), // Head is up (set to 0,-1,0 to look upside-down)
+        vec3.fromValues(0,1,0), // Head/Vector is up (set to 0,-1,0 to look upside-down)
         );
+
+    gl.uniformMatrix4fv(ctx.uProjectionMatId , false , projectionMat);
     gl.uniformMatrix4fv(ctx.uViewMatId , false , viewMat);
 
 
