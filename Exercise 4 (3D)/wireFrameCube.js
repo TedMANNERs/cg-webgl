@@ -16,6 +16,8 @@ class WireFrameCube {
         this.positionBuffer = -1;
         this.colorBuffer = -1;
 
+        this.verticeIndexCount = 0;
+
         this.setUpBuffers();
     }
 
@@ -31,13 +33,13 @@ class WireFrameCube {
     }
 
     setUpPositionBuffer() {
-        //   v10------v6/v11     v19------v18
-        //   /|      /|          /|      /|
-        //  / |     / |         / |     / |
-        // v3----v2/v7|        v16----v17 |
-        // | v9----|--v5/v8    | v23---|--v22
-        // | /     | /         | /     | /
-        // v0------v1/v4       v20-----v21
+        //   v6-------v7
+        //   /|      /|
+        //  / |     / |
+        // v3------v2 |
+        // | v5----|--v4
+        // | /     | /
+        // v0------v1
         // positions
         const vertices = [
             // X Y Z
@@ -47,35 +49,12 @@ class WireFrameCube {
              0.5,  0.5, -0.5, //v2  right, top
             -0.5,  0.5, -0.5, //v3  left,  top
 
-            // right
-             0.5, -0.5, -0.5, //v4  left,  bottom v1
-             0.5, -0.5,  0.5, //v5  right, bottom
-             0.5,  0.5,  0.5, //v6  right, top
-             0.5,  0.5, -0.5, //v7  left,  top    v2
-
             // back
-             0.5, -0.5,  0.5, //v8  left,  bottom v5
-            -0.5, -0.5,  0.5, //v9  right, bottom
-            -0.5,  0.5, -0.5, //v10 right, top
-             0.5,  0.5,  0.5, //v11 left,  top    v6
+             0.5, -0.5,  0.5, //v4  left,  bottom
+            -0.5, -0.5,  0.5, //v5  right, bottom
+            -0.5,  0.5,  0.5, //v6  right, top
+             0.5,  0.5,  0.5, //v7  left,  top
 
-            // left
-            -0.5, -0.5,  0.5, //v12  left,  bottom v9
-            -0.5, -0.5, -0.5, //v13  right, bottom v0
-            -0.5,  0.5, -0.5, //v14  right, top    v3
-            -0.5,  0.5,  0.5, //v15  left,  top    v10
-
-            // top
-            -0.5,  0.5, -0.5, //v16  left,  bottom v3
-             0.5,  0.5, -0.5, //v17  right, bottom v2
-             0.5,  0.5,  0.5, //v18  right, top    v6
-            -0.5,  0.5,  0.5, //v19  left,  top    v10
-
-            // bottom
-            -0.5, -0.5, -0.5, //v20  left,  bottom v0
-             0.5, -0.5, -0.5, //v21  right, bottom v1
-             0.5, -0.5,  0.5, //v22  right, top    v5
-            -0.5, -0.5,  0.5, //v23  left,  top    v9
         ];
 
         let buffer = this.gl.createBuffer();
@@ -93,36 +72,20 @@ class WireFrameCube {
             2, 3,
             3, 0,
 
-            // right
+            // back
             4, 5,
             5, 6,
             6, 7,
             7, 4,
 
-            // back
-            8, 9,
-            9, 10,
-            10, 11,
-            11, 8,
+            // sides
+            0, 5,
+            1, 4,
+            2, 7,
+            3, 6
 
-            // left
-            12, 13,
-            13, 14,
-            14, 15,
-            15, 12,
-
-            // top
-            16, 17,
-            17, 18,
-            18, 19,
-            19, 16,
-
-            // bottom
-            20, 21,
-            21, 22,
-            22, 23,
-            23, 20,
         ];
+        this.verticeIndexCount = vertexIndices.length;
         let buffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), this.gl.STATIC_DRAW);
@@ -151,8 +114,8 @@ class WireFrameCube {
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
 
-        // position 2x4 bytes
-        this.gl.vertexAttribPointer(this.ctx.aVertexPositionId, 2, this.gl.FLOAT, false, 0,0);
+        // position 3x4 bytes
+        this.gl.vertexAttribPointer(this.ctx.aVertexPositionId, 3, this.gl.FLOAT, false, 0,0);
         this.gl.enableVertexAttribArray(this.ctx.aVertexPositionId);
 
 
@@ -162,7 +125,7 @@ class WireFrameCube {
         this.gl.vertexAttribPointer(this.ctx.aVertexColorId, 4, this.gl.FLOAT, false, 0,0);
         this.gl.enableVertexAttribArray(this.ctx.aVertexColorId);
 
-        this.gl.drawElements(this.gl.LINES, 48, this.gl.UNSIGNED_SHORT, 0);
+        this.gl.drawElements(this.gl.LINES, this.verticeIndexCount, this.gl.UNSIGNED_SHORT, 0);
     }
 }
 
