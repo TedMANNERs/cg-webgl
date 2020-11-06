@@ -11,6 +11,7 @@ window.onload = startup;
 
 // global variables
 let gl; // the gl object is saved globally
+let lastUpdateTime; // timestamp of the last call of drawAnimated(..)
 
 // we keep all local parameters for the program in a single object
 let ctx = {
@@ -38,6 +39,7 @@ function startup() {
     const canvas = document.getElementById("myCanvas");
     gl = createGLContext(canvas);
     initGL();
+    window.requestAnimationFrame(drawAnimated);// Register function to call before the next redraw
     draw();
 }
 
@@ -93,7 +95,7 @@ function draw() {
     // Set up the view matrix for the camera
     let viewMat = mat4.create();
     mat4.lookAt(viewMat,
-        vec3.fromValues(10,10,10), // Camera position in world space
+        vec3.fromValues(10,0,10), // Camera position in world space
         vec3.fromValues(0,0,0), // looks at origin
         vec3.fromValues(0,1,0), // Head/Vector is up (set to 0,-1,0 to look upside-down)
         );
@@ -107,4 +109,29 @@ function draw() {
         shape.draw()
     }
     console.log("done");
+}
+
+
+/**
+ * Update and redraw scene every frame
+ * @param timestamp
+ */
+function drawAnimated(timestamp) {
+    // calculate time since last call
+    if (lastUpdateTime === undefined)
+        lastUpdateTime = timestamp;
+    const elapsed = timestamp - lastUpdateTime;
+    lastUpdateTime = timestamp;
+
+    // move or change objects
+    UpdateCube(elapsed);
+
+    // draw
+    draw();
+    // request the next frame
+    window.requestAnimationFrame(drawAnimated);
+}
+
+function UpdateCube(elapsedTime) {
+    shapeObjects[CUBE].rotate(0.03, 0, 1, 0)
 }
