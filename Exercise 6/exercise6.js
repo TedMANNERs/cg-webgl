@@ -5,6 +5,7 @@
 //
 import * as Color from "../color.js"
 import {ColorCube} from "./colorCube.js"
+import {SolidSphere} from "./solidSphere.js"
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -30,6 +31,7 @@ let ctx = {
 
 // names of the objects we want to draw
 const COLOR_CUBE = "color_cube";
+const SPHERE = "sphere";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
@@ -97,7 +99,8 @@ function setUpAttributesAndUniforms(){
  */
 function setUpObjects(){
     "use strict"
-    shapeObjects[COLOR_CUBE] = new ColorCube(gl, ctx, 0, 0, 0, 5, 5, 5, Color.RED);
+    shapeObjects[COLOR_CUBE] = new ColorCube(gl, ctx, 10, 0, 0, 5, 5, 5, Color.RED);
+    shapeObjects[SPHERE] = new SolidSphere(gl, ctx, 0, 0, 0, 4, 8, 8, Color.RED);
 }
 
 /**
@@ -109,7 +112,7 @@ function draw() {
 
     // set the light
     gl.uniform1i(ctx.uEnableLightingId, 1);
-    gl.uniform3fv(ctx.uLightPositionId, vec3.fromValues(-20,20,-20));
+    gl.uniform3fv(ctx.uLightPositionId, vec3.fromValues(0,20,-20));
     gl.uniform3fv(ctx.uLightColorId, vec3.fromValues(1,1,1));
 
     // Set up the projection matrix for world coordinates
@@ -120,7 +123,7 @@ function draw() {
     // Set up the view matrix for the camera
     let viewMat = mat4.create();
     mat4.lookAt(viewMat,
-        vec3.fromValues(20,20,20), // Camera position in world space
+        vec3.fromValues(20,20,20), // Csamera position in world space
         vec3.fromValues(0,0,0), // looks at origin
         vec3.fromValues(0,1,0), // Head/Vector is up (set to 0,-1,0 to look upside-down)
         );
@@ -148,7 +151,7 @@ function drawAnimated(timestamp) {
     lastUpdateTime = timestamp;
 
     // move or change objects
-    UpdateCube(elapsed);
+    UpdateObjects(elapsed);
 
     // draw
     draw();
@@ -156,6 +159,6 @@ function drawAnimated(timestamp) {
     window.requestAnimationFrame(drawAnimated);
 }
 
-function UpdateCube(elapsedTime) {
+function UpdateObjects(elapsedTime) {
     shapeObjects[COLOR_CUBE].rotate(0.03, 0, 1, 0)
 }
